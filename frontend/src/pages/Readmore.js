@@ -14,7 +14,6 @@ import vehicle10 from "../assets/10.jpg";
 import vehicle11 from "../assets/11.jpg";
 import vehicle12 from "../assets/12.jpg";
 
-
 const images = {
   'Toyota KDH': vehicle1,
   'Mercedes Benz': vehicle2,
