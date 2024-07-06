@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import '../styles/Currentride.css';
+import { useLocation } from 'react-router-dom';
 import ReactStars from "react-rating-stars-component";
+import { RideContext } from '../RideContext';
 
+// Editride Component
 const Editride = ({ currentrightdata, onSave, onClose, userRole }) => {
   const [formData, setFormData] = useState(currentrightdata);
 
@@ -24,7 +27,7 @@ const Editride = ({ currentrightdata, onSave, onClose, userRole }) => {
         <div className="currentride-popup-header">
           <button className="currentride-close-btn" onClick={onClose}>X</button>
         </div>
-        <h3>Edit Ride details</h3>
+        <h3>Edit Ride Details</h3>
         <div className='currentride-form'>
           {userRole === 'driver' && (
             <>
@@ -32,8 +35,8 @@ const Editride = ({ currentrightdata, onSave, onClose, userRole }) => {
                 Date:
                 <input
                   type="date"
-                  name="Date"
-                  value={formData.Date}
+                  name="date"
+                  value={formData.date}
                   onChange={handleChange}
                 />
               </label>
@@ -42,8 +45,8 @@ const Editride = ({ currentrightdata, onSave, onClose, userRole }) => {
                 Number of seats:
                 <input
                   type="text"
-                  name="Numberofseats"
-                  value={formData.Numberofseats}
+                  name="requestedSeats"
+                  value={formData.requestedSeats}
                   onChange={handleChange}
                 />
               </label>
@@ -52,8 +55,8 @@ const Editride = ({ currentrightdata, onSave, onClose, userRole }) => {
                 Time:
                 <input
                   type="text"
-                  name="Time"
-                  value={formData.Time}
+                  name="timePeriod"
+                  value={formData.timePeriod}
                   onChange={handleChange}
                 />
               </label>
@@ -62,8 +65,8 @@ const Editride = ({ currentrightdata, onSave, onClose, userRole }) => {
                 Preference:
                 <input
                   type="text"
-                  name="Preference"
-                  value={formData.Preference}
+                  name="preferences"
+                  value={formData.preferences}
                   onChange={handleChange}
                 />
               </label>
@@ -76,8 +79,8 @@ const Editride = ({ currentrightdata, onSave, onClose, userRole }) => {
                 Number of seats:
                 <input
                   type="text"
-                  name="Numberofseats"
-                  value={formData.Numberofseats}
+                  name="requestedSeats"
+                  value={formData.requestedSeats}
                   onChange={handleChange}
                 />
               </label>
@@ -93,6 +96,7 @@ const Editride = ({ currentrightdata, onSave, onClose, userRole }) => {
   );
 };
 
+// Rating Component
 const Rating = ({ onClose }) => {
   const [driverRating, setDriverRating] = useState(0);
 
@@ -114,8 +118,7 @@ const Rating = ({ onClose }) => {
         </div>
         <h3>Rate Your Ride</h3>
         <div className='currentride-rating'>
-          <label >
-            
+          <label>
             <ReactStars
               count={5}
               size={50}
@@ -134,51 +137,150 @@ const Rating = ({ onClose }) => {
   );
 };
 
-const Currentride = ({ userRole }) => {
-  const initialcurrentridedata = {
-    VehicleNumber: 'ABC123',
-    DriverName: 'John Doe',
-    Date: '2023-05-01',
-    PickupLocation: 'Kandy',
-    DropoffLocation: 'Galle',
-    Route: ['Kandy', 'Matara', 'Galle'],
-    Time: '5 AM - 11 AM',
-    Numberofseats: '5',
-    Preference: 'No smoking',
-    Passengers: [
-      { name: 'Alice', seat: '1' },
-      { name: 'Bob', seat: '2' }
-    ]
-  };
+// DriverView Component
+// DriverView Component
+const DriverView = ({ currentrightdata, onConfirmRide, isConfirming, toggleEditRide, handleCancel, showDeleteDialog, handleFinishRide, isFinishDialogVisible, hideFinishDialog }) => (
+  <div className='currentride-card-box'>
+    <h3>Ride Details</h3>
+    <div className='currentride-box-container'>
+      <div className='currentride-box'>
+        <p><strong>Date:</strong> {currentrightdata.date}</p>
+        <p><strong>Pickup Location:</strong> {currentrightdata.from}</p>
+        <p><strong>Drop-off Location:</strong> {currentrightdata.to}</p>
+        <p><strong>Route: </strong>{currentrightdata.route.join(' ➜ ')}</p>
+        <p><strong>Time Period:</strong> {currentrightdata.timePeriod}</p>
+        <p><strong>Number of seats:</strong> {currentrightdata.requestedSeats}</p>
+        <p><strong>Preference:</strong> {currentrightdata.preferences}</p>
+        {currentrightdata.passengers && currentrightdata.passengers.length > 0 && (
+          <div>
+            <h4>Passengers:</h4>
+            <ul>
+              {currentrightdata.passengers.map((passengers, index) => (
+                <li key={index}>
+                  <p><strong>Name:</strong> {passengers.name}</p>
+                  <p><strong>Seats:</strong> {passengers.seats}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {isConfirming && (
+          <div className="currentride-button-container">
+            <button className='currentride-action-button' onClick={onConfirmRide}>Confirm Ride</button>
+          </div>
+        )}
+      </div>
+    </div>
+    <div className="currentride-button-container">
+      <button className='currentride-action-button' onClick={toggleEditRide}>Edit Ride</button>
+      <button className='currentride-action-button' onClick={handleCancel}>Cancel Ride</button>
+      <button className='currentride-action-button' onClick={handleFinishRide}>Finish Ride</button>
+      {isFinishDialogVisible && (
+        <div className="currentride-popup">
+          <div className="currentride-popup-delete-inner">
+            <h2>Ride Finished!</h2>
+            <p>Your ride is finished!</p>
+            <button className="currentride-action-button" onClick={hideFinishDialog}>Close</button>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+);
 
-  const [currentrightdata, setcurrentridedata] = useState(initialcurrentridedata);
-  const [openpopup, setopenpopup] = useState(false);
-  const [cancelride, setcancelride] = useState(null);
+
+// PassengerView Component
+const PassengerView = ({ currentrightdata, toggleEditRide, handleCancel, showDeleteDialog, handleFinishRide, isFinishDialogVisible, hideFinishDialog, isRatingDialogVisible, hideRatingDialog }) => (
+  <div className='currentride-card-box'>
+    <h3>Ride Details</h3>
+    <div className='currentride-box-container'>
+      <div className='currentride-box'>
+        <p><strong>Driver Name:</strong> {currentrightdata.driverName}</p>
+        <p><strong>Vehicle Number:</strong> {currentrightdata.vehicleNumber}</p>
+        <p><strong>Date:</strong> {currentrightdata.date}</p>
+        <p><strong>Time:</strong> {currentrightdata.timePeriod}</p>
+        <p><strong>Pickup Location:</strong> {currentrightdata.from}</p>
+        <p><strong>Drop-off Location:</strong> {currentrightdata.to}</p>
+        <p><strong>Route: </strong>{currentrightdata.route.join(' ➜ ')}</p>
+        <p><strong>Number of seats:</strong> {currentrightdata.requestedSeats}</p>
+        <p><strong>Preference:</strong> {currentrightdata.preferences}</p>
+      </div>
+    </div>
+    <div className="currentride-button-container">
+      <button className='currentride-action-button' onClick={toggleEditRide}>Edit Ride</button>
+      <button className='currentride-action-button' onClick={handleCancel}>Cancel Ride</button>
+      <button className='currentride-action-button' onClick={handleFinishRide}>Finish Ride</button>
+      {isFinishDialogVisible && (
+        <div className="currentride-popup">
+          <div className="currentride-popup-delete-inner">
+            <h2>Ride Finished!</h2>
+            <p>Your ride is finished!</p>
+            <button className="currentride-action-button" onClick={hideFinishDialog}>Close</button>
+          </div>
+        </div>
+      )}
+      {isRatingDialogVisible && (
+        <Rating onClose={hideRatingDialog} />
+      )}
+    </div>
+  </div>
+);
+
+// Currentride Component
+
+const Currentride = ({ userRole }) => {
+  const location = useLocation();
+  const { card, requestedSeats, passengers } = location.state || {};
+  const { currentRide, setCurrentRide } = useContext(RideContext);
+
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [openpopup, setOpenpopup] = useState(false);
+  const [cancelride, setCancelride] = useState(null);
   const [isDeleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [isFinishDialogVisible, setFinishDialogVisible] = useState(false);
   const [isRatingDialogVisible, setRatingDialogVisible] = useState(false);
 
-  const handleSavecurrentride = (formData) => {
-    setcurrentridedata(formData);
+  useEffect(() => {
+    if (card) {
+      setCurrentRide({ ...card, requestedSeats, passengers });
+      setIsConfirming(true);
+    }
+  }, [card, requestedSeats, passengers, setCurrentRide]);
+
+  if (!currentRide) {
+    return <div>No current ride available</div>;
+  }
+
+  const handleConfirmRide = () => {
+    // Simulate confirming the ride request
+    // Replace this with an actual API call
+    setTimeout(() => {
+      alert('Ride confirmed');
+      setIsConfirming(false);
+    }, 1000);
   };
 
-  const toggleopenpopup = () => {
-    setopenpopup(!openpopup);
+  const handleSaveCurrentRide = (formData) => {
+    setCurrentRide(formData);
   };
 
-  const handlecancel = (formData) => {
-    setcancelride(formData);
+  const toggleEditRide = () => {
+    setOpenpopup(!openpopup);
+  };
+
+  const handleCancel = () => {
+    setCancelride(true);
   };
 
   const closeModel = () => {
-    setcancelride(null);
+    setCancelride(null);
   };
 
-  const showDeleteDialoge = () => {
+  const showDeleteDialog = () => {
     setDeleteDialogVisible(true);
   };
 
-  const hideDeleteDialoge = () => {
+  const hideDeleteDialog = () => {
     setDeleteDialogVisible(false);
   };
 
@@ -197,185 +299,72 @@ const Currentride = ({ userRole }) => {
     setRatingDialogVisible(false);
   };
 
-  const DriverView = () => (
-    <>
-      <div className='currentride-card-box'>
-        <h3>Ride details</h3>
-        <div className='currentride-box-container'>
-          <div className='currentride-box'>
-            <p><strong>Date:</strong> {currentrightdata.Date}</p>
-            <p><strong>Pickup Location:</strong> {currentrightdata.PickupLocation}</p>
-            <p><strong>Drop-off Location:</strong>{currentrightdata.DropoffLocation}</p>
-            <p><strong>Route: </strong>{currentrightdata.Route.join(' ➜ ')}</p>
-            <p><strong>Time Period:</strong> {currentrightdata.Time}</p>
-            <p><strong>Number of seats:</strong> {currentrightdata.Numberofseats}</p>
-            <p><strong>Preference:</strong> {currentrightdata.Preference}</p>
-            <p><strong>Passengers:</strong></p>
-          
-            {currentrightdata.Passengers.map((passenger, index) => (
-              <p key={index}>{passenger.name} ➜ Seat: {passenger.seat}</p>
-            ))}
-          
-          </div>
-        </div>
-        <div className="currentride-button-container">
-          <button className='currentride-action-button' onClick={toggleopenpopup}>Edit Ride</button>
-          {openpopup && (
-            <Editride
-              currentrightdata={currentrightdata}
-              onSave={handleSavecurrentride}
-              onClose={toggleopenpopup}
-              userRole={userRole}
-            />
-          )}
-
-<button className='currentride-action-button' onClick={handlecancel}>Cancel Ride</button>
-          {cancelride && (
-            <div className="currentride-popup">
-              <div className="currentride-popup-Inner">
-                <button className="currentride-close-btn" onClick={closeModel}>
-                  &times;
-                </button><br />
-                <h2>Ride Details</h2><br />
-                <p><strong>Date:</strong> {currentrightdata.Date}</p><br />
-                <p><strong>Number of seats:</strong> {currentrightdata.Numberofseats}</p><br />
-                <p><strong>Preference:</strong> {currentrightdata.Preference}</p><br />
-                <p><strong>Time:</strong> {currentrightdata.Time}</p><br />
-                <p><strong>Pickup Location:</strong> {currentrightdata.PickupLocation}</p><br />
-                <p><strong>Drop-off Location:</strong> {currentrightdata.DropoffLocation}</p><br />
-                <button className="currentride-delete-button" onClick={showDeleteDialoge}>
-                  Delete Ride
-                </button>
-              </div>
-            </div>
-          )}
-          {isDeleteDialogVisible && (
-            <div className="currentride-popup">
-              <div className="currentride-popup-delete-inner">
-                <h2>Confirm Deletion</h2><br />
-                <p>Are you sure you want to delete this Ride?</p><br />
-                <div className='currentride-button-container'>
-                  <button className='currentride-yes-button'>
-                    Yes
-                  </button>
-                  <button className="currentride-No-button" onClick={hideDeleteDialoge}>
-                    No
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <button className='currentride-action-button' onClick={handleFinishRide}>Finish Ride</button>
-          {isFinishDialogVisible && (
-            <div className="currentride-popup">
-              <div className="currentride-popup-delete-inner">
-                <h2>Ride Finished!</h2>
-                <br />
-                <p>Your ride is finished!</p>
-                <br />
-                <button className="currentride-action-button" onClick={hideFinishDialog}>Close</button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </>
-  );
-
-  const PassengerView = () => (
-    <div className='currentride-card-box'>
-      <h3>Ride details</h3>
-      <div className='currentride-box-container'>
-        <div className='currentride-box'>
-          <p><strong>Driver Name:</strong> {currentrightdata.DriverName}</p>
-          <p><strong>Vehicle Number:</strong> {currentrightdata.VehicleNumber}</p>
-          <p><strong>Date:</strong> {currentrightdata.Date}</p>
-          <p><strong>Time:</strong> {currentrightdata.Time}</p>
-          <p><strong>Pickup Location:</strong> {currentrightdata.PickupLocation}</p>
-          <p><strong>Drop-off Location:</strong> {currentrightdata.DropoffLocation}</p>
-          <p><strong>Route: </strong>{currentrightdata.Route.join(' ➜ ')}</p>
-          <p><strong>Number of seats:</strong> {currentrightdata.Numberofseats}</p>
-          <p><strong>Preference:</strong> {currentrightdata.Preference}</p>
-        </div>
-      </div>
-      <div className="currentride-button-container">
-        <button className='currentride-action-button' onClick={toggleopenpopup}>Edit Ride</button>
-        {openpopup && (
-          <Editride
-            currentrightdata={currentrightdata}
-            onSave={handleSavecurrentride}
-            onClose={toggleopenpopup}
-            userRole={userRole}
-          />
-        )}
-
-<button className='currentride-action-button' onClick={handlecancel}>Cancel Ride</button>
-          {cancelride && (
-            <div className="currentride-popup">
-              <div className="currentride-popup-Inner">
-                <button className="currentride-close-btn" onClick={closeModel}>
-                  &times;
-                </button>
-                <h2>Ride Details</h2>
-                <p><strong>Driver Name:</strong> {currentrightdata.DriverName}</p>
-          <p><strong>Vehicle Number:</strong> {currentrightdata.VehicleNumber}</p>
-          <p><strong>Date:</strong> {currentrightdata.Date}</p>
-          <p><strong>Time:</strong> {currentrightdata.Time}</p>
-          <p><strong>Pickup Location:</strong> {currentrightdata.PickupLocation}</p>
-          <p><strong>Drop-off Location:</strong> {currentrightdata.DropoffLocation}</p>
-          <p><strong>Route: </strong>{currentrightdata.Route.join(' ➜ ')}</p>
-          <p><strong>Number of seats:</strong> {currentrightdata.Numberofseats}</p>
-          <p><strong>Preference:</strong> {currentrightdata.Preference}</p>
-                <button className="currentride-delete-button" onClick={showDeleteDialoge}>
-                  Delete Ride
-                </button>
-              </div>
-            </div>
-          )}
-          {isDeleteDialogVisible && (
-            <div className="currentride-popup">
-              <div className="currentride-popup-delete-inner">
-                <h2>Confirm Deletion</h2><br />
-                <p>Are you sure you want to delete this Ride?</p><br />
-                <div className='currentride-button-container'>
-                  <button className='currentride-yes-button'>
-                    Yes
-                  </button>
-                  <button className="currentride-No-button" onClick={hideDeleteDialoge}>
-                    No
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-
-        <button className='currentride-action-button' onClick={handleFinishRide}>Finish Ride</button>
-        {isFinishDialogVisible && (
-          <div className="currentride-popup">
-            <div className="currentride-popup-delete-inner">
-              <h2>Ride Finished!</h2>
-              <br />
-              <p>Your ride is finished!</p>
-              <br />
-              <button className="currentride-action-button" onClick={hideFinishDialog}>Close</button>
-            </div>
-          </div>
-        )}
-        {isRatingDialogVisible && (
-          <Rating onClose={hideRatingDialog} />
-        )}
-      </div>
-    </div>
-  );
-
   return (
     <div className='currentride'>
       <div className='currentride-header-title'>
         <h1>Current Ride</h1>
       </div>
-      {userRole === 'driver' ? <DriverView /> : <PassengerView />}
+      {userRole === 'driver' ? (
+        <DriverView
+          currentrightdata={currentRide}
+          onConfirmRide={handleConfirmRide}
+          isConfirming={isConfirming}
+          toggleEditRide={toggleEditRide}
+          handleCancel={handleCancel}
+          showDeleteDialog={showDeleteDialog}
+          handleFinishRide={handleFinishRide}
+          isFinishDialogVisible={isFinishDialogVisible}
+          hideFinishDialog={hideFinishDialog}
+        />
+      ) : (
+        <PassengerView
+          currentrightdata={currentRide}
+          toggleEditRide={toggleEditRide}
+          handleCancel={handleCancel}
+          showDeleteDialog={showDeleteDialog}
+          handleFinishRide={handleFinishRide}
+          isFinishDialogVisible={isFinishDialogVisible}
+          hideFinishDialog={hideFinishDialog}
+          isRatingDialogVisible={isRatingDialogVisible}
+          hideRatingDialog={hideRatingDialog}
+        />
+      )}
+      {openpopup && (
+        <Editride
+          currentrightdata={currentRide}
+          onSave={handleSaveCurrentRide}
+          onClose={toggleEditRide}
+          userRole={userRole}
+        />
+      )}
+      {cancelride && (
+        <div className="currentride-popup">
+          <div className="currentride-popup-Inner">
+            <button className="currentride-close-btn" onClick={closeModel}>&times;</button>
+            <h2>Ride Details</h2>
+            <p><strong>Date:</strong> {currentRide.date}</p>
+            <p><strong>Pickup Location:</strong> {currentRide.from}</p>
+            <p><strong>Drop-off Location:</strong> {currentRide.to}</p>
+            <p><strong>Route: </strong>{currentRide.route.join(' ➜ ')}</p>
+            <p><strong>Time Period:</strong> {currentRide.timePeriod}</p>
+            <p><strong>Number of seats:</strong> {currentRide.requestedSeats}</p>
+            <p><strong>Preference:</strong> {currentRide.preferences}</p>
+            <button className="currentride-delete-button" onClick={showDeleteDialog}>Delete Ride</button>
+          </div>
+        </div>
+      )}
+      {isDeleteDialogVisible && (
+        <div className="currentride-popup">
+          <div className="currentride-popup-delete-inner">
+            <h2>Confirm Deletion</h2>
+            <p>Are you sure you want to delete this Ride?</p>
+            <div className='currentride-button-container'>
+              <button className='currentride-yes-button'>Yes</button>
+              <button className="currentride-No-button" onClick={hideDeleteDialog}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

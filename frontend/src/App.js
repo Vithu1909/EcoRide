@@ -13,6 +13,7 @@ import Readmore from './pages/Readmore'; // Import Readmore component
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 //import cards from "./Carddata";
+import { RideProvider } from './RideContext';
 
 const MainLayout = ({ children }) => (
   <div className="dashboard">
@@ -26,6 +27,7 @@ const MainLayout = ({ children }) => (
 function App() {
   const userRole = 'driver';
   return (
+    <RideProvider>
     <BrowserRouter>
       <Routes>
         
@@ -35,12 +37,13 @@ function App() {
         <Route path="/newsfeed" element={<MainLayout><Newsfeed /></MainLayout>} />
         <Route path="/addride" element={<MainLayout><Addride /></MainLayout>} />
         <Route path="/currentride" element={<MainLayout><Currentride userRole={userRole} /></MainLayout>} />
-        <Route path="/readmore/:id" element={<MainLayout><Readmore /></MainLayout>} /> {/* Pass cards to Readmore */}
+        <Route path="/readmore/:id" element={<MainLayout><Readmore userRole={userRole} /></MainLayout>} /> {/* Pass cards to Readmore */}
 
         <Route path="/admin" element={<Admin />} />
         <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
       </Routes>
     </BrowserRouter>
+    </RideProvider>
   );
 }
 

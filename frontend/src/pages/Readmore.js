@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import {useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Readmore.css';
-import vehicle1 from "../assets/1.jpg"; // Import the image file
+import vehicle1 from "../assets/1.jpg";
 import vehicle2 from "../assets/2.jpg";
 import vehicle3 from "../assets/3.jpg";
 import vehicle4 from "../assets/4.jpg";
@@ -13,7 +13,6 @@ import vehicle9 from "../assets/9.jpg";
 import vehicle10 from "../assets/10.jpg";
 import vehicle11 from "../assets/11.jpg";
 import vehicle12 from "../assets/12.jpg";
-
 
 const images = {
   'Toyota KDH': vehicle1,
@@ -31,12 +30,12 @@ const images = {
 };
 
 const Readmore = () => {
- // const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { card } = location.state || {}; // Access the card data from state
+  const { card } = location.state || {};
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [requestedSeats, setRequestedSeats] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   if (!card) {
     return <div>Card not found</div>;
@@ -51,9 +50,15 @@ const Readmore = () => {
   };
 
   const handleSubmitRequest = () => {
-    console.log(`Requested ${requestedSeats} seats`);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      // Simulate API call
+      alert('Requested',{requestedSeats}, 'seats');
     setIsPopupOpen(false);
-  };
+    navigate('/currentride', { state: { card, requestedSeats } });
+  }, 1000);
+};
 
   return (
     <div className="readmore-container">
@@ -94,7 +99,7 @@ const Readmore = () => {
 
       {isPopupOpen && (
         <div className="readmore-popup">
-          <div className="readmore-popup-inner">
+          <div className="readmore-popup-Inner">
             <h3>Request Seats</h3>
             <label>
               Number of Seats:
@@ -110,6 +115,7 @@ const Readmore = () => {
               <button className="readmore-action-button" onClick={handleClosePopup}>Cancel</button>
               <button className="readmore-action-button" onClick={handleSubmitRequest}>Submit</button>
             </div>
+            {loading && <p>Loading....</p>}
           </div>
         </div>
       )}

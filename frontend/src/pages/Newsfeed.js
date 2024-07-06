@@ -19,6 +19,11 @@ const Newsfeed = () => {
       vehicleNumber: 'ABC-1234',
       driverName: 'John Doe',
       preferences: 'None'
+
+      //passengers: [
+    //{ name: 'John Doe', seats: 2 },
+    //{ name: 'Jane Doe', seats: 1 }
+  //]
     },
     {
       car: 'Mercedes Benz',
