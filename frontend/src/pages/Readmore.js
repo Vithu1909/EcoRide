@@ -115,7 +115,7 @@ const Readmore = () => {
               <button className="readmore-action-button" onClick={handleClosePopup}>Cancel</button>
               <button className="readmore-action-button" onClick={handleSubmitRequest}>Submit</button>
             </div>
-            {loading && <p>Loading...</p>}
+            {loading && <p>Loading....</p>}
           </div>
         </div>
       )}
