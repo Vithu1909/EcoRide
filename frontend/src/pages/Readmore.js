@@ -1,7 +1,7 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import '../styles/Readmore.css'; // Import the CSS file for Readmore styling
-import vehicle1 from "../assets/1.jpg"; // Import the image file
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import '../styles/Readmore.css';
+import vehicle1 from "../assets/1.jpg";
 import vehicle2 from "../assets/2.jpg";
 import vehicle3 from "../assets/3.jpg";
 import vehicle4 from "../assets/4.jpg";
@@ -28,54 +28,99 @@ const images = {
   'Byd M6': vehicle11,
   'Mercedes Sprinter': vehicle12
 };
-const Readmore = ({ cards }) => {
-  const { id } = useParams();
+
+const Readmore = () => {
   const navigate = useNavigate();
-  const card = cards[parseInt(id, 10)];
+  const location = useLocation();
+  const { card } = location.state || {};
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [requestedSeats, setRequestedSeats] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   if (!card) {
     return <div>Card not found</div>;
   }
 
+  const handleRequestRide = () => {
+    setIsPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
+
+  const handleSubmitRequest = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      // Simulate API call
+      //alert(Requested $ {requestedSeats}, seats);
+    setIsPopupOpen(false);
+    navigate('/currentride', { state: { card, requestedSeats } });
+  }, 1000);
+};
+
   return (
     <div className="readmore-container">
       <h2>{card.car}</h2>
       <div className="image">
-        <img alt="img" src={images[card.car]} />
+        <img alt="Vehicle" src={images[card.car]} />
       </div>
-      <div className="card-details">
-        <div className="detail">
-          <span className="label"><strong>Vehicle Number:</strong></span> {card.vehicleNumber}
+      <div className="readmore-card-details">
+        <div className="readmore-detail">
+          <span className="readmore-label"><strong>Vehicle Number:</strong></span> {card.vehicleNumber}
         </div>
-        <div className="detail">
-          <span className="label"><strong>Driver Name:</strong></span> {card.driverName}
+        <div className="readmore-detail">
+          <span className="readmore-label"><strong>Driver Name:</strong></span> {card.driverName}
         </div>
-        <div className="detail">
-          <span className="label"><strong>From:</strong></span> {card.from}
+        <div className="readmore-detail">
+          <span className="readmore-label"><strong>From:</strong></span> {card.from}
         </div>
-        <div className="detail">
-          <span className="label"><strong>To:</strong></span> {card.to}
+        <div className="readmore-detail">
+          <span className="readmore-label"><strong>To:</strong></span> {card.to}
         </div>
-        <div className="detail">
-          <span className="label"><strong>Route:</strong></span> {card.route.join(' ➜ ')}
+        <div className="readmore-detail">
+          <span className="readmore-label"><strong>Route:</strong></span> {card.route.join(' ➜ ')}
         </div>
-        <div className="detail">
-          <span className="label"><strong>Time Period:</strong></span> {card.timePeriod}
+        <div className="readmore-detail">
+          <span className="readmore-label"><strong>Time Period:</strong></span> {card.timePeriod}
         </div>
-        <div className="detail">
-          <span className="label"><strong>Available Seats:</strong></span> {card.seats}
+        <div className="readmore-detail">
+          <span className="readmore-label"><strong>Available Seats:</strong></span> {card.seats}
         </div>
-        <div className="detail">
-          <span className="label"><strong>Preferences:</strong></span> {card.preferences}
+        <div className="readmore-detail">
+          <span className="readmore-label"><strong>Preferences:</strong></span> {card.preferences}
         </div>
       </div>
-      <div className="btn-container">
-        <button className="back-button" onClick={() => navigate(-1)}>Back</button>
-        <button className="request-button">Request Ride</button>
+      <div className="readmore-btn-container">
+        <button className="readmore-back-button" onClick={() => navigate(-1)}>Back</button>
+        <button className="readmore-request-button" onClick={handleRequestRide}>Request Ride</button>
       </div>
+
+      {isPopupOpen && (
+        <div className="readmore-popup">
+          <div className="readmore-popup-Inner">
+            <h3>Request Seats</h3>
+            <label>
+              Number of Seats:
+              <input
+                type="number"
+                value={requestedSeats}
+                min="1"
+                max={card.seats}
+                onChange={(e) => setRequestedSeats(e.target.value)}
+              />
+            </label>
+            <div className="readmore-button-container">
+              <button className="readmore-action-button" onClick={handleClosePopup}>Cancel</button>
+              <button className="readmore-action-button" onClick={handleSubmitRequest}>Submit</button>
+            </div>
+            {loading && <p>Loading...</p>}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 
 export default Readmore;
