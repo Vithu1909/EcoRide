@@ -54,7 +54,7 @@ const Readmore = () => {
     setTimeout(() => {
       setLoading(false);
       // Simulate API call
-      //alert(Requested $ {requestedSeats}, seats);
+      //alert(Requested $ {requestedSeats} seats);
     setIsPopupOpen(false);
     navigate('/currentride', { state: { card, requestedSeats } });
   }, 1000);
